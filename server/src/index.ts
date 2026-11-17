@@ -15,7 +15,7 @@ app.use(cors({ origin: config.clientOrigins }));
 app.use(express.json({ limit: "1mb" }));
 
 app.get("/api/health", (_req, res) => {
-  res.json({ status: "ok", db: mongoose.connection.readyState === 1 ? "connected" : "disconnected" });
+  res.json({ status: "ok" });
 });
 
 app.use("/api/auth", authRouter);
@@ -25,9 +25,11 @@ app.use("/api", (_req, res) => res.status(404).json({ error: "Not found" }));
 app.use(errorHandler);
 
 async function main() {
-  await mongoose.connect(config.mongoUri);
-  console.log("MongoDB connected");
-  app.listen(config.port, () => console.log(`API on http://localhost:${config.port}`));
+  app.listen(config.port, () => console.log(`Listening on ${config.port}`));
+  await mongoose.connect(process.env.MONGODB_URI!).then(
+      () => console.log('Mongo connected'),
+      (err) => console.error('Mongo failed:', err.message)
+  );
 }
 main().catch((e) => {
   console.error(e);
