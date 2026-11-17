@@ -1,8 +1,12 @@
+"use client";
+
 import { ButtonLink } from "@/components/ui/button";
+import { HealthGate } from "@/components/ui/health-gate";
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen flex flex-col justify-between bg-canvas text-ink">
+    <HealthGate>
+      <div className="min-h-screen flex flex-col justify-between bg-canvas text-ink">
       <header className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         <span className="font-semibold text-lg text-primary tracking-tight">
           Survey Builder
@@ -43,5 +47,6 @@ export default function HomePage() {
         </div>
       </footer>
     </div>
+    </HealthGate>
   );
 }

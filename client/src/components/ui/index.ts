@@ -9,3 +9,4 @@ export * from "./alert";
 export * from "./spinner";
 export * from "./modal";
 export * from "./icons";
+export * from "./health-gate";
