@@ -41,13 +41,14 @@ function fingerprint(questions: any[]): string {
   );
 }
 
-router.get("/", async (_req, res) => {
-  const surveys = await Survey.find()
+router.get("/", async (req, res) => {
+  const surveys = await Survey.find({ owner: res.locals.adminId })
       .select("title description status version createdAt updatedAt")
       .sort({ updatedAt: -1 })
       .lean();
 
   const counts = await SurveyResponse.aggregate([
+    { $match: { surveyId: { $in: surveys.map((s) => s._id) } } },
     { $group: { _id: "$surveyId", count: { $sum: 1 } } },
   ]);
   const countById = new Map(counts.map((c) => [String(c._id), c.count as number]));
@@ -57,19 +58,19 @@ router.get("/", async (_req, res) => {
 
 router.post("/", async (req, res) => {
   const data = normalize(surveyInput.parse(req.body));
-  const survey = await Survey.create({ ...data, version: 1 });
+  const survey = await Survey.create({ ...data, version: 1, owner: res.locals.adminId });
   res.status(201).json(survey);
 });
 
 router.get("/:id", async (req, res) => {
-  const survey = await Survey.findById(parseId(req.params.id));
+  const survey = await Survey.findOne({ _id: parseId(req.params.id), owner: res.locals.adminId });
   if (!survey) throw new AppError(404, "Survey not found");
   res.json(survey);
 });
 
 router.get("/:id/analytics", async (req, res) => {
   const id = parseId(req.params.id);
-  const survey = await Survey.findById(id);
+  const survey = await Survey.findOne({ _id: id, owner: res.locals.adminId });
   if (!survey) throw new AppError(404, "Survey not found");
 
   let version: number | undefined;
@@ -89,7 +90,7 @@ router.put("/:id", async (req, res) => {
   const id = parseId(req.params.id);
   const data = normalize(surveyInput.parse(req.body));
 
-  const survey = await Survey.findById(id);
+  const survey = await Survey.findOne({ _id: id, owner: res.locals.adminId });
   if (!survey) throw new AppError(404, "Survey not found");
 
   const questionsChanged = fingerprint(survey.questions as any[]) !== fingerprint(data.questions);
@@ -103,7 +104,7 @@ router.put("/:id", async (req, res) => {
 
 router.delete("/:id", async (req, res) => {
   const id = parseId(req.params.id);
-  const deleted = await Survey.findByIdAndDelete(id);
+  const deleted = await Survey.findOneAndDelete({ _id: id, owner: res.locals.adminId });
   if (!deleted) throw new AppError(404, "Survey not found");
 
   await SurveyResponse.deleteMany({ surveyId: id });

@@ -25,6 +25,7 @@ const surveySchema = new Schema(
         status: { type: String, enum: ["draft", "published"], default: "draft" },
         version: { type: Number, default: 1 },
         questions: { type: [questionSchema], default: [] },
+        owner: { type: Schema.Types.ObjectId, ref: "Admin", required: true, index: true },
     },
     { timestamps: true },
 );

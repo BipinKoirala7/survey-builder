@@ -182,6 +182,16 @@ export default function AdminLoginPage() {
                 </Button>
               </div>
             </form>
+
+            <p className="mt-4 text-center text-xs text-muted">
+              Don&apos;t have an account?{" "}
+              <Link
+                href="/admin/register"
+                className="font-medium text-primary hover:text-primary-hover transition-colors"
+              >
+                Create one
+              </Link>
+            </p>
           </CardBody>
         </Card>
       </div>

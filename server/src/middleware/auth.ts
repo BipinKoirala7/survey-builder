@@ -26,6 +26,7 @@ export async function requireAdmin(req: Request, res: Response, next: NextFuncti
       issuer: ISSUER,
       algorithms: [ALG],
     });
+    if (!payload.sub) throw new AppError(401, "Invalid or expired token");
     res.locals.adminId = payload.sub;
     next();
   } catch {

@@ -30,6 +30,9 @@ export default function HomePage() {
             <ButtonLink href="/admin/login" variant="primary" size="md">
               Admin login
             </ButtonLink>
+            <ButtonLink href="/admin/register" variant="secondary" size="md">
+              Create account
+            </ButtonLink>
           </div>
         </div>
       </main>
