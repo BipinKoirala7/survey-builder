@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import { SignJWT, jwtVerify } from "jose";
-import { config } from "../config";
-import { AppError } from "../errors/AppError";
+import { config } from "../config.js";
+import { AppError } from "../errors/AppError.js";
 
 const secret = new TextEncoder().encode(config.jwtSecret);
 const ISSUER = "survey-builder";

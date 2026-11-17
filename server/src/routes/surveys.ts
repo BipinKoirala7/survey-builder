@@ -1,11 +1,11 @@
 import { Router } from "express";
 import { isValidObjectId } from "mongoose";
-import { Survey } from "../model/survey";
-import { Response as SurveyResponse } from "../model/response";
-import { requireAdmin } from "../middleware/auth";
-import { AppError } from "../errors/AppError";
-import { surveyInput, type SurveyInput } from "../lib/survey-input";
-import { getSurveyAnalytics } from "../lib/analytics";
+import { Survey } from "../model/survey.js";
+import { Response as SurveyResponse } from "../model/response.js";
+import { requireAdmin } from "../middleware/auth.js";
+import { AppError } from "../errors/AppError.js";
+import { surveyInput, type SurveyInput } from "../lib/survey-input.js";
+import { getSurveyAnalytics } from "../lib/analytics.js";
 
 const router = Router();
 router.use(requireAdmin);

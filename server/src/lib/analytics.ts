@@ -1,5 +1,5 @@
 import { Types } from "mongoose";
-import { Response as SurveyResponse } from "../model/response";
+import { Response as SurveyResponse } from "../model/response.js";
 
 export interface SurveyAnalyticsQuestionOption {
   option: string;

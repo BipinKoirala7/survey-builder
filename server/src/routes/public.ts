@@ -2,10 +2,10 @@ import { Router } from "express";
 import { isValidObjectId } from "mongoose";
 import { rateLimit } from "express-rate-limit";
 import { z } from "zod";
-import { AppError } from "../errors/AppError";
-import { Survey } from "../model/survey";
-import { Response as SurveyResponse } from "../model/response";
-import { validateAnswers } from "../lib/validate-answers";
+import { AppError } from "../errors/AppError.js";
+import { Survey } from "../model/survey.js";
+import { Response as SurveyResponse } from "../model/response.js";
+import { validateAnswers } from "../lib/validate-answers.js";
 
 const SUBMIT_RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000;
 const SUBMIT_RATE_LIMIT_MAX = 10;

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { getVisibleQuestions, type Question } from "./visibility";
+import { getVisibleQuestions, type Question } from "./visibility.js";
 
 function buildQuestionSchema(q: Question): z.ZodType {
   const isReq = !!q.required;

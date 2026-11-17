@@ -1,12 +1,12 @@
-import { config } from "@/";
+import { config } from "./config.js";
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import mongoose from "mongoose";
-import authRouter from "./routes/auth";
-import surveysRouter from "./routes/surveys";
-import publicRouter from "./routes/public";
-import {errorHandler} from "./errors/error-handler";
+import authRouter from "./routes/auth.js";
+import surveysRouter from "./routes/surveys.js";
+import publicRouter from "./routes/public.js";
+import {errorHandler} from "./errors/error-handler.js";
 
 const app = express();
 app.set("trust proxy", 1);

@@ -1,9 +1,9 @@
-import { config } from "./config";
+import { config } from "./config.js";
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import { randomUUID } from "node:crypto";
-import { Admin } from "./model/admin";
-import { Survey } from "./model/survey";
+import { Admin } from "./model/admin.js";
+import { Survey } from "./model/survey.js";
 
 async function main() {
   await mongoose.connect(config.mongoUri);

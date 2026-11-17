@@ -1,8 +1,8 @@
-import { config } from "./config";
+import { config } from "./config.js";
 import mongoose from "mongoose";
-import { Survey } from "./model/survey";
-import { Response as SurveyResponse } from "./model/response";
-import { getVisibleQuestions, type Question } from "./lib/visibility";
+import { Survey } from "./model/survey.js";
+import { Response as SurveyResponse } from "./model/response.js";
+import { getVisibleQuestions, type Question } from "./lib/visibility.js";
 
 const SAMPLE_TEXT_FEEDBACK = [
   "The interface is very clean and easy to use.",

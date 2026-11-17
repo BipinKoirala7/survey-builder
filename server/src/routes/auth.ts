@@ -2,9 +2,9 @@ import { Router } from "express";
 import rateLimit from "express-rate-limit";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
-import { AppError } from "../errors/AppError";
-import { signAdminToken } from "../middleware/auth";
-import {Admin} from "../model/admin";
+import { AppError } from "../errors/AppError.js";
+import { signAdminToken } from "../middleware/auth.js";
+import {Admin} from "../model/admin.js";
 
 const router = Router();
 
