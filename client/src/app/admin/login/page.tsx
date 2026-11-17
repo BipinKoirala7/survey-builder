@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { z } from "zod";
 import Link from "next/link";
 import { getToken, setToken } from "@/lib/auth";
 import { apiPost, ApiError } from "@/lib/api";
@@ -19,14 +18,22 @@ import { Button } from "@/components/ui/button";
 import { Alert } from "@/components/ui/alert";
 import { ArrowLeftIcon } from "@/components/ui/icons";
 
-const loginSchema = z.object({
-  email: z
-    .string()
-    .trim()
-    .min(1, "Email is required")
-    .email("Please enter a valid email address"),
-  password: z.string().min(1, "Password is required"),
-});
+function validateLogin(
+  email: string,
+  password: string
+): { email?: string; password?: string } {
+  const errors: { email?: string; password?: string } = {};
+  const trimmed = email.trim();
+  if (!trimmed) {
+    errors.email = "Email is required";
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+    errors.email = "Please enter a valid email address";
+  }
+  if (!password) {
+    errors.password = "Password is required";
+  }
+  return errors;
+}
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -53,28 +60,20 @@ export default function AdminLoginPage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setServerError(null);
-    setErrors({});
 
-    const result = loginSchema.safeParse({ email, password });
-    if (!result.success) {
-      const fieldErrors: { email?: string; password?: string } = {};
-      for (const issue of result.error.issues) {
-        if (issue.path[0] === "email" && !fieldErrors.email) {
-          fieldErrors.email = issue.message;
-        } else if (issue.path[0] === "password" && !fieldErrors.password) {
-          fieldErrors.password = issue.message;
-        }
-      }
+    const fieldErrors = validateLogin(email, password);
+    if (Object.keys(fieldErrors).length > 0) {
       setErrors(fieldErrors);
       return;
     }
 
     setIsLoading(true);
+    setErrors({});
 
     try {
       const data = await apiPost<{ token: string }>("/api/auth/login", {
-        email: result.data.email,
-        password: result.data.password,
+        email: email.trim(),
+        password,
       });
 
       if (data?.token) {

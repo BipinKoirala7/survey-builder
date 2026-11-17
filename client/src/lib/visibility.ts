@@ -1,3 +1,4 @@
+// This file is a copy of server/src/lib/visibility.ts — keep the logic in sync.
 import type { Question, Answers } from "./types";
 
 export type { Answers };

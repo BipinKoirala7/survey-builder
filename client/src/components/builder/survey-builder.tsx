@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { Survey, SurveyInput, SurveyStatus, QuestionType } from "@/lib/types";
 import { apiPost, apiPut, ApiError } from "@/lib/api";
@@ -12,6 +11,7 @@ import { Select } from "@/components/ui/select";
 import { Field } from "@/components/ui/field";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert } from "@/components/ui/alert";
+import { Modal } from "@/components/ui/modal";
 import {
   ArrowLeftIcon,
   CopyIcon,
@@ -68,6 +68,7 @@ export function SurveyBuilder({
   const [generalError, setGeneralError] = useState<string | null>(null);
   const [unhandledIssues, setUnhandledIssues] = useState<string[]>([]);
   const [isDirty, setIsDirty] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
 
   // Field validation errors
   const [titleError, setTitleError] = useState<string | null>(null);
@@ -109,6 +110,20 @@ export function SurveyBuilder({
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, [isDirty]);
+
+  // Cancel / Back navigation
+  const handleCancel = () => {
+    if (isDirty) {
+      setShowCancelModal(true);
+      return;
+    }
+    router.push("/admin");
+  };
+
+  const handleConfirmCancel = () => {
+    setShowCancelModal(false);
+    router.push("/admin");
+  };
 
   // Clean and validate conditional dependencies whenever question list or types/options change
   const validateConditions = useCallback(
@@ -415,12 +430,10 @@ export function SurveyBuilder({
           auth: true,
         });
         setIsDirty(false);
-        setSuccessMessage("Survey created successfully!");
         setSurveyId(created._id);
-        // Replace route to edit mode
-        router.replace(`/admin/surveys/${created._id}`);
+        router.replace("/admin");
       } else {
-        const updated = await apiPut<Survey>(
+        await apiPut<Survey>(
           `/api/surveys/${surveyId}`,
           payload,
           {
@@ -428,13 +441,7 @@ export function SurveyBuilder({
           }
         );
         setIsDirty(false);
-        setSuccessMessage("Survey saved successfully!");
-        // Update local state with normalized survey
-        if (updated) {
-          setTitle(updated.title);
-          setDescription(updated.description);
-          setStatus(updated.status);
-        }
+        router.replace("/admin");
       }
     } catch (err) {
       if (err instanceof ApiError) {
@@ -498,16 +505,18 @@ export function SurveyBuilder({
       {/* Sticky Header Bar */}
       <div className="sticky top-0 z-30 bg-canvas/95 backdrop-blur-md border-b border-line -mx-4 px-4 sm:-mx-6 sm:px-6 py-3.5 transition-all">
         <div className="flex flex-wrap items-center justify-between gap-3 max-w-5xl mx-auto">
-          {/* Left: Back Link & Title */}
+          {/* Left: Cancel Button & Title */}
           <div className="flex items-center gap-3">
-            <Link
-              href="/admin"
-              className="p-1.5 rounded-lg text-muted hover:text-ink hover:bg-surface border border-transparent hover:border-line transition-colors"
-              title="Back to surveys"
-              aria-label="Back to surveys"
+            <Button
+              type="button"
+              variant="ghost"
+              size="md"
+              onClick={handleCancel}
+              className="text-xs font-medium px-2.5"
             >
-              <ArrowLeftIcon className="w-5 h-5" />
-            </Link>
+              <ArrowLeftIcon className="w-4 h-4" />
+              Cancel
+            </Button>
             <div>
               <h1 className="text-xl font-bold text-ink leading-none">
                 {isNew ? "New survey" : "Edit survey"}
@@ -808,6 +817,34 @@ export function SurveyBuilder({
           </div>
         )}
       </div>
+
+      {/* Cancel Confirmation Modal */}
+      <Modal
+        isOpen={showCancelModal}
+        onClose={() => setShowCancelModal(false)}
+        title="Discard changes?"
+        description="You have unsaved changes. Are you sure you want to go back?"
+        footer={
+          <>
+            <Button
+              type="button"
+              variant="secondary"
+              size="md"
+              onClick={() => setShowCancelModal(false)}
+            >
+              Keep editing
+            </Button>
+            <Button
+              type="button"
+              variant="danger"
+              size="md"
+              onClick={handleConfirmCancel}
+            >
+              Discard & Go back
+            </Button>
+          </>
+        }
+      />
     </div>
   );
 }

@@ -125,5 +125,16 @@ export default function EditSurveyPage() {
     return null;
   }
 
-  return <SurveyBuilder initialSurvey={survey} isNew={false} />;
+  return (
+    <>
+      {survey.version > 1 && (
+        <div className="max-w-5xl mx-auto -mt-4 mb-4">
+          <Alert variant="info" className="py-2 px-3 text-xs">
+            This survey has <strong>version {survey.version}</strong>. Changing questions will create a new version — previous responses remain linked to their original version.
+          </Alert>
+        </div>
+      )}
+      <SurveyBuilder initialSurvey={survey} isNew={false} />
+    </>
+  );
 }
