@@ -79,13 +79,16 @@ npm install
 
 ### 2. Configure environment
 
-**Server** — create `server/.env`:
+**Server** — copy and edit `server/.env`:
 
-```env
-MONGODB_URI=mongodb://localhost:27017/surveybuilder
-JWT_SECRET=your-secret-key
-CLIENT_ORIGIN=http://localhost:3000
-PORT=4000
+```bash
+cp server/.env.example server/.env
+```
+
+Then edit `server/.env` with your values. Generate a strong `JWT_SECRET` (≥32 characters):
+
+```bash
+openssl rand -base64 48
 ```
 
 **Client** — create `client/.env.local`:
@@ -101,6 +104,8 @@ cd server
 npm run seed          # Creates a default admin user
 npm run seed:responses # Populates sample survey responses for analytics
 ```
+
+The seed script reads `ADMIN_EMAIL` and `ADMIN_PASSWORD` from `server/.env`. If they are not set, it uses the defaults from `.env.example`.
 
 ### 4. Run both services
 
@@ -121,6 +126,7 @@ Open [http://localhost:3000](http://localhost:3000) for the landing page or [htt
 | Method | Route | Auth | Description |
 |--------|-------|------|-------------|
 | `POST` | `/api/auth/login` | No | Login with email/password, returns JWT |
+| `POST` | `/api/auth/register` | No | Register a new admin account (rate limited: 10/hour per IP). Registration is open to anyone. |
 | `GET` | `/api/surveys` | Yes | List all surveys (with response counts) |
 | `POST` | `/api/surveys` | Yes | Create a new survey |
 | `GET` | `/api/surveys/:id` | Yes | Get full survey details |
@@ -143,7 +149,7 @@ npm run build
 npm start
 ```
 
-Set `NEXT_PUBLIC_API_URL` to your server's URL.
+Set `NEXT_PUBLIC_API_URL` to your server's URL. Note that `NEXT_PUBLIC_API_URL` is baked into the build at compile time, so it must be set **before** running `npm run build`. Changing it requires a full redeploy.
 
 ### Server
 
@@ -153,13 +159,30 @@ npm run build
 NODE_ENV=production npm start
 ```
 
-Set all required environment variables (`MONGODB_URI`, `JWT_SECRET`, `CLIENT_ORIGIN`, `PORT`).
+Required environment variables (the server exits at startup if any are invalid):
+
+| Variable | Description | Default |
+|----------|-------------|--------|
+| `NODE_ENV` | `development` \| `production` \| `test` | `development` |
+| `PORT` | Port to listen on | `4000` |
+| `MONGODB_URI` | MongoDB connection string (must start with `mongodb://` or `mongodb+srv://`) | *(required)* |
+| `JWT_SECRET` | Secret key for signing JWTs (≥32 characters) | *(required)* |
+| `CLIENT_ORIGIN` | Comma-separated list of allowed CORS origins (trailing slashes stripped) | `http://localhost:3000` |
+
+Generate a strong `JWT_SECRET` with `openssl rand -base64 48`.
 
 ### Notes
 
 - Configure `CLIENT_ORIGIN` with your frontend's production URL for CORS.
 - Use a strong, random `JWT_SECRET` in production.
 - The server trusts the first proxy (`trust proxy: 1`), suitable for deployment behind a reverse proxy like Nginx or a platform like Vercel/Railway.
+
+### Render + Vercel Deployment
+
+- **Server (Render)** — Set Root Directory to `server/`, Build Command to `yarn install --production=false && yarn build`, and Start Command to `yarn start`. Configure all environment variables above in Render's dashboard.
+- **Client (Vercel)** — Set `NEXT_PUBLIC_API_URL` to your Render server URL before building.
+- **MongoDB Atlas** — Add `0.0.0.0/0` to the Atlas Network Access IP whitelist so Render can connect.
+- **Free tier** — Render's free tier sleeps after ~15 minutes of idle time; the first request after sleep will take a few seconds to wake up.
 
 ## Assumptions & Trade-offs
 
