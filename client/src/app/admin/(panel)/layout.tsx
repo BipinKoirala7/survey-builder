@@ -40,14 +40,6 @@ export default function AdminPanelLayout({
             >
               Survey Builder
             </Link>
-            <nav className="flex items-center gap-4">
-              <Link
-                href="/admin"
-                className="text-sm font-medium text-ink hover:text-primary transition-colors"
-              >
-                Surveys
-              </Link>
-            </nav>
           </div>
 
           <div className="flex items-center gap-2">
