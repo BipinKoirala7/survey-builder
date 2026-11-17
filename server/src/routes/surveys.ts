@@ -5,6 +5,7 @@ import { Response as SurveyResponse } from "../model/response";
 import { requireAdmin } from "../middleware/auth";
 import { AppError } from "../errors/AppError";
 import { surveyInput, type SurveyInput } from "../lib/survey-input";
+import { getSurveyAnalytics } from "../lib/analytics";
 
 const router = Router();
 router.use(requireAdmin);
@@ -64,6 +65,24 @@ router.get("/:id", async (req, res) => {
   const survey = await Survey.findById(parseId(req.params.id));
   if (!survey) throw new AppError(404, "Survey not found");
   res.json(survey);
+});
+
+router.get("/:id/analytics", async (req, res) => {
+  const id = parseId(req.params.id);
+  const survey = await Survey.findById(id);
+  if (!survey) throw new AppError(404, "Survey not found");
+
+  let version: number | undefined;
+  if (req.query.version !== undefined) {
+    const vStr = typeof req.query.version === "string" ? req.query.version : "";
+    if (!/^[1-9]\d*$/.test(vStr)) {
+      throw new AppError(400, "Invalid version");
+    }
+    version = Number(vStr);
+  }
+
+  const analytics = await getSurveyAnalytics(survey, version);
+  res.json(analytics);
 });
 
 router.put("/:id", async (req, res) => {
